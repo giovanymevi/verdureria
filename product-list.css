@@ -137,6 +137,36 @@ body {
   100% { transform: translateX(-100%); }
 }
 
+.categories-container {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0 20px;
+  margin-bottom: 10px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.categories-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.category-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 8px 18px;
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.category-btn.active {
+  background: #22c55e;
+  color: white;
+  border-color: #22c55e;
+}
+
 .hero-copy {
   color: white;
   max-width: 640px;

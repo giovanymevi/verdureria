@@ -3,76 +3,36 @@ const SHIPPING_COST = 5000;
 const FREE_SHIPPING_THRESHOLD = 30000;
 
 const PRODUCTS = [
-  ["1001", "Manzana Roja", 1690, "manzana.jpeg"],
-  ["1002", "Kiwi", 1690 ,"kiwi.jpeg"],
-  ["1003", "Limón", 1390,"limon.jpeg"],
-  ["1004", "Pera", 1690, "pera.jpeg"],
-  ["1005", "Mandarinas", 1990, "mandarina.jpeg"],
-  ["1006", "Tomates Bandeja", 1490],
-  ["1007", "Zapallo Italiano", 1490],
-  ["1008", "Pepinos", 1290],
-  ["1009", "Zanahoria", 1190],
-  ["1010", "Cebollas", 990],
-  ["1011", "Brócoli", 1590],
-  ["1012", "Coliflor", 1990],
-  ["1013", "Zapallo Camote", 990],
-  ["1014", "Mongoliana", 1690],
-  ["1015", "Champiñón Laminado", 1690],
-  ["1016", "Mangos", 1490],
-  ["1017", "Tomates Cherry", 1990],
-  ["1018", "Choclos", 1490],
-  ["1019", "Ajo", 990],
-  ["1020", "Ají Chileno", 990],
-  ["1021", "Poroto Verde", 1290],
-  ["1022", "Albaca", 990],
-  ["1023", "Espinaca", 790],
-  ["1024", "Acelga Bolsa", 790],
-  ["1025", "Perejil", 790],
-  ["1026", "Pimentón Verde", 490],
-  ["1027", "Pimentón Rojo", 990],
-  ["1028", "Cilantro", 790],
-  ["1029", "Escarolas", 990],
-  ["1030", "Plátanos por Kilo", 1490],
-  ["1031", "Costinas", 1290],
-  ["1032", "Acelga Paquete", 2490],
-  ["1033", "Cebollín", 990],
-  ["1034", "Beterragas", 1490],
-  ["1035", "Papa Tierra", 1990],
-  ["1036", "Genjibre", 590],
-  ["1037", "Manzana Pablo", 1490],
-  ["1038", "Ciboulette", 490],
-  ["1039", "Frutillas", 1990],
-  ["1040", "Cebolla Morada", 990],
-  ["1041", "Cazuelas", 2490],
-  ["1042", "Ensaladas", 1290],
-  ["1043", "Mentas", 490],
-  ["1044", "Uvas", 1590],
-  ["1045", "Plátano Maduro", 2190],
-  ["1046", "Shapsui", 1690],
-  ["1048", "Naranja", 1690],
-  ["1049", "Ciruela", 1690],
-  ["1050", "Membrillos", 1690],
-  ["1051", "Champiñón Entero", 2290],
-  ["1052", "Piña", 2990],
-  ["1053", "Lechuga Marina", 990],
-  ["1054", "Lechuga Escarola", 1290],
-  ["1055", "Poroto Verde Picado", 790],
-  ["1056", "Mix Verdura Picada", 1490],
-  ["1057", "Papa Lavada", 1990],
-  ["1058", "Papa Camote", 2490],
-  ["1059", "Tomate Granel", 1690],
-  ["1061", "Manzana Verde", 1690],
-  ["1062", "Pepino Fruta", 1690],
-  ["1063", "Mancaqui", 1990],
+  // Formato: [Código, Nombre, Precio, Categoría, Imagen (opcional)]
+  ["1001", "Manzana Roja", 1690, "Verdulería", "manzana.jpeg"],
+  ["1002", "Kiwi", 1690, "Verdulería", "kiwi.jpeg"],
+  ["1003", "Limón", 1390, "Verdulería", "limon.jpeg"],
+  ["2001", "Pan Marraqueta (Granel)", 1200, "Panadería"],
+  ["2002", "Pan Hallulla (Granel)", 1200, "Panadería"],
+  ["2003", "Croissant", 1500, "Panadería"],
+  ["3001", "Arroz Grado 1 (1kg)", 1800, "Abarrotes"],
+  ["3002", "Aceite Maravilla (1L)", 2490, "Abarrotes"],
+  ["3003", "Azúcar Blanca (1kg)", 1350, "Abarrotes"],
+  ["3004", "Fideos Espagueti", 990, "Abarrotes"],
+  ["4001", "Detergente Líquido", 4500, "Limpieza"],
+  ["4002", "Jabón de Manos", 1200, "Limpieza"],
+  ["4003", "Limpia Pisos Floral", 1890, "Limpieza"],
+  ["5001", "Salsa de chocolate", 2690, "Salsas","SALSA.jpg"],
+  ["5002", "Vinagre vino Tinto", 990, "Salsas","vinagre.jpg"],
+  ["5003", "Salsa frambuesa", 2690, "Salsas","salsa frambuesa.jpg"],
+  ["5004", "Mostaza", 1690, "Salsas","mostaza.jpg" ],
+  ["1035", "Papa Tierra", 1990, "Verdulería"],
+  ["1040", "Cebolla Morada", 990, "Verdulería"]
 ];
 
-const PRODUCTS_WITH_META = PRODUCTS.map(([code, name, price, imageUrl]) => {
+const PRODUCTS_WITH_META = PRODUCTS.map(([code, name, price, category, imageUrl]) => {
   const { emoji, color } = styleFor(name);
 
   return {
     code,
     name,
     price,
+    category: category || "Verdulería",
     emoji,
     bgColor: color,
     image: imageUrl || "", // Ahora se queda vacío por defecto
@@ -82,6 +42,7 @@ const PRODUCTS_WITH_META = PRODUCTS.map(([code, name, price, imageUrl]) => {
 const cart = {};
 let loadingLocation = false;
 let query = "";
+let currentCategory = "Todos";
 
 const productsGrid = document.getElementById("productsGrid");
 const productCount = document.getElementById("productCount");
@@ -92,6 +53,7 @@ const emptyState = document.getElementById("emptyState");
 const toast = document.getElementById("toast");
 const searchInput = document.getElementById("searchInput");
 const cartButton = document.getElementById("cartButton");
+const categoryBar = document.getElementById("categoryBar");
 
 function formatCLP(n) {
   return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(n);
@@ -131,6 +93,10 @@ function styleFor(name) {
     [/ciruela/, "🟣", "#ede9fe"],
     [/membrillo/, "🍐", "#fef9c3"],
     [/pi[nñ]a/, "🍍", "#fde68a"],
+    [/pan|hallulla|marraqueta|croissant/, "🥖", "#fffbeb"],
+    [/arroz|aceite|azucar|fideos/, "🥫", "#f8fafc"],
+    [/detergente|jabon|limpia/, "🧼", "#f0fdf4"],
+    [/ketchup|mayonesa|mostaza|salsa/, "🍅", "#fff1f2"],
     [/mancaqui/, "🥭", "#fde68a"],
   ];
   for (const [re, emoji, color] of list) {
@@ -241,12 +207,40 @@ function clearCart() {
 }
 
 function filteredProducts() {
+  const term = query.trim().toLowerCase();
   return PRODUCTS_WITH_META.filter((product) => {
-    const term = query.trim().toLowerCase();
-    return (
+    const matchesSearch = 
       product.name.toLowerCase().includes(term) ||
-      product.code.includes(term)
-    );
+      product.code.includes(term);
+    
+    const matchesCategory = currentCategory === "Todos" || product.category === currentCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
+}
+
+function renderCategories() {
+  if (!categoryBar) return;
+  
+  const categories = ["Todos", "Abarrotes", "Panadería", "Limpieza", "Salsas", "Verdulería"];
+  categoryBar.innerHTML = "";
+  
+  categories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = `category-btn ${currentCategory === cat ? "active" : ""}`;
+    btn.textContent = cat;
+    btn.onclick = () => {
+      currentCategory = cat;
+      renderCategories();
+      renderProducts();
+      
+      // Scroll suave al inicio de la lista
+      document.querySelector(".products-header").scrollIntoView({ 
+        behavior: "smooth", 
+        block: "start" 
+      });
+    };
+    categoryBar.appendChild(btn);
   });
 }
 
@@ -395,5 +389,6 @@ cartButton.addEventListener("click", () => {
   document.getElementById("carrito").scrollIntoView({ behavior: "smooth" });
 });
 
+renderCategories();
 renderProducts();
 renderCart();
